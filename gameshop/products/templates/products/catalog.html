@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% for product in products %}
+        <p>
+            {{ product }}
+            <a href="{% url 'products:game' product.slug %}"><button>Посмотреть игру</button></a>
+        </p>
+    {% endfor %}
+{% endblock content %}

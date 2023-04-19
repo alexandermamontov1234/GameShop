@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<br>
+<link rel="stylesheet" href="style.css">
+<script src="https://js.stripe.com/v3/"></script>
+{% for product in products %}
+    <a href="{% url 'products:game' product.slug %}"><button>{{product.title}}</button></a>
+    {{product.get_final_price}}
+{% endfor %}
+<p>Итоговая цена {{ total_price }}</p>
+<form action="{% url 'profiles:create-checkout-session' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit" id="checkout-button">К оплате</button>
+</form>
+{% endblock content %}

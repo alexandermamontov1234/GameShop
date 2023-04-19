@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>
+    <p>{{product.title}}</p>
+    <p>Категория {{product.cat}}</p>
+    <p>Цена {{product.price}}</p>
+    <p>Общий рейтинг {{product.get_rating}}</p>
+</p>
+
+<h3>Отзывы</h3>
+{% for review in reviews %}
+    <p>
+        <p> {{ review.user }} </p>
+        <p> отзыв: {{ review.body }} </p>
+        <p> рейтинг: {{ review.rate }} </p>
+    </p>
+{% endfor %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Добавить</button>
+</form>
+
+{% for message in messages %}
+    {{ message }}
+{% endfor %}
+
+{% endblock content %}
