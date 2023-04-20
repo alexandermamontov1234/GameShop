@@ -21,9 +21,10 @@ from .views import home_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home_view, name='home'),
     path('products/', include('products.urls', namespace='products')),
-    path('profiles/', include('profiles.urls', namespace='profiles'))
+    path('profiles/', include('profiles.urls', namespace='profiles')),
+    path('accounts/', include('allauth.urls')),
+    path('', home_view, name='home'),
 ]
 
 

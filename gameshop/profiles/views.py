@@ -1,3 +1,4 @@
+import os
 import stripe as stripe
 from django.conf import settings
 from django.core.mail import send_mail
@@ -102,12 +103,11 @@ def stripe_webhook(request):
         message = ""
         for key, value in session["metadata"].items():
             message += f"\nНазвание товара: {key}, ссылка для скачивания: {value}"
-        print(session["metadata"])
         send_mail(
             subject="Вот Ваш продукт",
             message=f"Спасибо за покупку! Вот ваши товары:{message}",
             recipient_list=[customer_email],
-            from_email="qwerty@mail.ru"
+            from_email=str(os.getenv('EMAIL_HOST_USER'))
         )
 
     return HttpResponse(status=200)
