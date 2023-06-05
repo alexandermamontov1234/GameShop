@@ -17,11 +17,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class ShoppingCart(ListView):
     model = Product
     template_name = 'profiles/shopping_cart.html'
-    # context_object_name = 'products'
 
-    # def get_queryset(self):
-    #     qs = Product.objects.filter(shopping_cart=self.request.user.profile)
-    #     return qs
 
     def get_context_data(self, *, object_list=None, **kwargs):
         products = Product.objects.filter(shopping_cart=self.request.user.profile)
@@ -32,7 +28,6 @@ class ShoppingCart(ListView):
         for product in products:
             total_price += product.get_final_price
         context['total_price'] = total_price
-#       context["STRIPE_PUBLIC_KEY"] = settings.STRIPE_PUBLIC_KEY
 
         return context
 
@@ -59,7 +54,6 @@ class CreateCheckoutSessionView(View):
                         'unit_amount': int(product.get_final_price),
                         'product_data': {
                             'name': product.title,
-                            # 'images': ['https://i.imgur.com/EHyR2nP.png'],
                         },
                     },
                     'quantity': 1,
@@ -87,13 +81,10 @@ def stripe_webhook(request):
             payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         )
     except ValueError as e:
-        # Invalid payload
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
         return HttpResponse(status=400)
 
-        # Handle the checkout.session.completed event
     if event['type'] == 'checkout.session.completed':
         session = stripe.checkout.Session.retrieve(
             event['data']['object']['id'],
