@@ -1,6 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
-{% for product in products %}
-    <a href="{% url 'products:game' product.slug %}"><button>{{product.title}}</button></a>
-{% endfor %}
+    <div class="row justify-content-start" style="margin-top:20px; margin-left:20px">
+            <ul class="list-unstyled">
+                 {% for product in products %}
+                    <li>
+                        <h1>{{ product }}</h1>
+                    </li>
+                    {% if product.discount %}
+                    <li>
+                        <h5>Скидка {{ product.discount }}% Цена <del>{{ product.price }}</del> {{ product.get_final_price}}</h5>
+                    </li>
+                    {% else %}
+                    <li>
+                        <h5>Цена {{ product.get_final_price}}</h5>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'products:game' product.slug %}"><img style="max-width:20%" src={{product.image.url}}  class="img-fluid scale rounded-3"></a>
+                    </li>
+                    <br>
+                 {% endfor %}
+            </ul>
+    </div>
 {% endblock content %}

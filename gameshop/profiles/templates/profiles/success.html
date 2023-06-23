@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Success</title>
-</head>
-<body>
-Поздравляем с покупкой!
-<a href="{% url 'home' %}"><button>Вернуться на главную</button></a>
-</body>
-</html>
+{% extends 'base.html' %}
+<title>Success</title>
+{% block content %}
+    <h1>Поздравляем с покупкой!</h1>
+{% endblock content %}

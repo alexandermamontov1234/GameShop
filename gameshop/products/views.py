@@ -101,7 +101,7 @@ class DiscountProduct(ListView):
 
 class SearchView(ListView):
     model = Product
-    template_name = 'products/search.html'
+    template_name = 'products/catalog.html'
     context_object_name = 'products'
 
     def get_queryset(self):

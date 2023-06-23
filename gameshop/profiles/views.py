@@ -1,4 +1,6 @@
 import os
+import uuid
+
 import stripe as stripe
 from django.conf import settings
 from django.core.mail import send_mail
@@ -10,8 +12,8 @@ from django.views.generic import ListView, DetailView, TemplateView
 from .models import Profile, User
 from products.models import Product
 
-
 stripe.api_key = settings.STRIPE_SECRET_KEY
+random_url = str(uuid.uuid4())[:8].replace('-', '').lower()
 
 
 class ShoppingCart(ListView):
@@ -40,6 +42,12 @@ class ShoppingCart(ListView):
 class SuccessView(TemplateView):
     template_name = "profiles/success.html"
 
+    def get(self, request, *args, **kwargs):
+        products = Product.objects.filter(shopping_cart=self.request.user.profile)
+        for product in products:
+            product.shopping_cart.remove(self.request.user.profile)
+        return redirect("home")
+
 
 class CancelView(TemplateView):
     template_name = "profiles/cancel.html"
@@ -55,11 +63,10 @@ class CreateCheckoutSessionView(View):
             metadata[product.title] = 'product.url'
             line_items.append({
                     'price_data': {
-                        'currency': 'usd',
-                        'unit_amount': int(product.get_final_price),
+                        'currency': 'rub',
+                        'unit_amount': int(product.get_final_price) * 100,
                         'product_data': {
                             'name': product.title,
-                            # 'images': ['https://i.imgur.com/EHyR2nP.png'],
                         },
                     },
                     'quantity': 1,
@@ -69,7 +76,7 @@ class CreateCheckoutSessionView(View):
             line_items=line_items,
             metadata=metadata,
             mode='payment',
-            success_url=YOUR_DOMAIN + 'success/',
+            success_url=YOUR_DOMAIN + 'success/' + random_url,
             cancel_url=YOUR_DOMAIN + 'cancel/',
         )
 
@@ -78,6 +85,7 @@ class CreateCheckoutSessionView(View):
 
 @csrf_exempt
 def stripe_webhook(request):
+    print(request.data)
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
     event = None
@@ -109,6 +117,10 @@ def stripe_webhook(request):
             recipient_list=[customer_email],
             from_email=str(os.getenv('EMAIL_HOST_USER'))
         )
+        # for product in products:
+        #     print(session["metadata"]['products'])
+        #     print(type(session["metadata"]['products']))
+        #     product.shopping_cart.remove(session["metadata"]['user'])
 
     return HttpResponse(status=200)
 

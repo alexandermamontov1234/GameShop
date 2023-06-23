@@ -1,8 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-<p>{{ profile.first_name }}</p>
-<p><img src={{profile.avatar.url}}></p>
-<a href="{% url 'profiles:favorite' %}"><button>Желаемое</button></a>
-<a href="{% url 'profiles:shopping-cart' %}"><button>Корзина</button></a>
-{{ profile.last_name }}
+    <div class="row justify-content-start" style="margin-top:20px; margin-left:20px">
+        <ul class="list-unstyled">
+            <li>
+                <h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
+            </li>
+            <li>
+                <h5>Телефон {{ profile.number }}</h5>
+            </li>
+            <li>
+                <h5>Страна {{ profile.country }}</h5>
+            </li>
+            <li>
+                <h5>Баланс {{ profile.balance }}</h5>
+            </li>
+            <li>
+                <img src={{profile.avatar.url}} style="max-width:14%" class="img-fluid">
+            </li>
+        </ul>
+    </div>
 {% endblock content %}
