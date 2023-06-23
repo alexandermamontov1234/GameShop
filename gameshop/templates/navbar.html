@@ -19,23 +19,34 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ discount }}">Товары по скидкам</a>
         </li>
+        {% if categories %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Категории
+          </a>
+          <ul class="dropdown-menu">
+            <p>
+                {% for category in categories %}
+                    <li><a class="dropdown-item" href="{% url 'products:category' category.slug%}">{{ category }}</a></li>
+                {% endfor %}
+            </p>
+          </ul>
+        </li>
+        {% endif %}
         <li class="nav-item">
         <form action="{% url 'products:search' %}" method="GET" class="d-flex" role="search">
-          <input name="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <input name="search" class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Поиск</button>
         </form>
         </li>
       </ul>
-              {% if request.user.is_authenticated %}
-
-        {% endif %}
       <ul class="navbar-nav">
       {% if request.user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ myprofile }}">Мой кабинет</a>
+          <a class="nav-link" href="{{ myprofile }}">Мой кабинет <i class="fa-regular fa-user"></i></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ shopping_cart }}">Корзина</a>
+          <a class="nav-link" href="{{ shopping_cart }}">Корзина <i class="fa-solid fa-cart-shopping"></i></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'account_logout' %}">Выход</a>
@@ -48,8 +59,3 @@
   </div>
 </nav>
 
-<p>
-    {% for category in categories %}
-        <a href="{% url 'products:category' category.slug%}"><button>{{ category }}</button></a>
-    {% endfor %}
-</p>

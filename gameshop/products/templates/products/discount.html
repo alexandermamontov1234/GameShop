@@ -1,11 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% for product in products %}
-    <a href="{% url 'products:game' product.slug %}"><button>{{product}}</button></a>
-    <p>Скидка {{ product.discount }}%</p>
-    <p>
-        Цена <del>{{ product.price }}</del> {{ product.get_final_price}}
-    </p>
-{% endfor %}
+
+<div class="row justify-content-start" style="margin-top:20px; margin-left:20px">
+        <div class="col-6">
+            <ul class="list-unstyled">
+                 {% for product in products %}
+                    {% if not forloop.counter|divisibleby:2 %}
+                        <li>
+                            <h1>{{ product }}</h1>
+                        </li>
+                        <li>
+                            <h5>Скидка {{ product.discount }}% Цена <del>{{ product.price }}</del> {{ product.get_final_price}}</h5>
+                        </li>
+                        <li>
+                            <a href="{% url 'products:game' product.slug %}"><img src={{product.image.url}} width="auto" height="400"  class="img-fluid scale rounded-3"></a>
+                        </li>
+                        <br>
+                    {% endif %}
+                 {% endfor %}
+            </ul>
+        </div>
+        <div class="col-6">
+            <ul class="list-unstyled">
+                 {% for product in products %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <li>
+                            <h1>{{ product }}</h1>
+                        </li>
+                        <li>
+                            <h5>Скидка {{ product.discount }}% Цена <del>{{ product.price }}</del> {{ product.get_final_price}}</h5>
+                        </li>
+                        <li>
+                            <a href="{% url 'products:game' product.slug %}"><img src={{product.image.url}} width="auto" height="400"  class="img-fluid scale rounded-3"></a>
+                        </li>
+                        <br>
+                    {% endif %}
+                 {% endfor %}
+            </ul>
+        </div>
+    </div>
 {% endblock content %}

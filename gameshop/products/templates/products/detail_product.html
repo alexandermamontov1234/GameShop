@@ -1,29 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
-<p>
-    <p>{{product.title}}</p>
-    <p>Категория {{product.cat}}</p>
-    <p>Цена {{product.price}}</p>
-    <p>Общий рейтинг {{product.get_rating}}</p>
-</p>
 
-<h3>Отзывы</h3>
-{% for review in reviews %}
-    <p>
-        <p> {{ review.user }} </p>
-        <p> отзыв: {{ review.body }} </p>
-        <p> рейтинг: {{ review.rate }} </p>
-    </p>
-{% endfor %}
+<div style="margin-top:20px; margin-left:40px; margin-bottom:20px">
+        <ul class="list-unstyled">
+            <li><h1>{{ product }}</h1></li>
+            <li><h5>Категория {{product.cat}}</h5></li>
+            <li><img src={{product.image.url}} width="auto" height="400" class="rounded-3"></p></li>
+            <li><h5>Цена {{product.price}}</h5></li>
+            <li><h5>Рейтинг {{product.get_rating}}</h5></li>
+            <li><h6>Описание</h6> {{product.description}}</li>
+        </ul>
+    <div class="border" style="padding-top:10px; padding-left:20px; padding-bottom:15px">
+        <ul class="list-unstyled">
+            <li><h4>Отзывы</h4></li>
+            {% for review in reviews %}
+                <li> {{ review.user }} </li>
+                <li> Оценка: {{ review.rate }} </li>
+                <li> Отзыв: {{ review.body }} </li>
+             {% endfor %}
+            <br>
+            <li>
+                <form action="" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success">Добавить</button>
+                </form>
+            </li>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Добавить</button>
-</form>
-
-{% for message in messages %}
-    {{ message }}
-{% endfor %}
+</div>
 
 {% endblock content %}

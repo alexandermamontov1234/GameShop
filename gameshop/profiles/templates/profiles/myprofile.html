@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <p>{{ profile.first_name }}</p>
+<p><img src={{profile.avatar.url}}></p>
 <a href="{% url 'profiles:favorite' %}"><button>Желаемое</button></a>
 <a href="{% url 'profiles:shopping-cart' %}"><button>Корзина</button></a>
 {{ profile.last_name }}
