@@ -1,29 +1,27 @@
+import decimal
 import os
-import uuid
-
 import stripe as stripe
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic.edit import FormMixin, UpdateView, FormView
+
+from .forms import EditProfileForm
 from .models import Profile, User
 from products.models import Product
 
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
-random_url = str(uuid.uuid4())[:8].replace('-', '').lower()
 
 
 class ShoppingCart(ListView):
     model = Product
     template_name = 'profiles/shopping_cart.html'
-    # context_object_name = 'products'
-
-    # def get_queryset(self):
-    #     qs = Product.objects.filter(shopping_cart=self.request.user.profile)
-    #     return qs
 
     def get_context_data(self, *, object_list=None, **kwargs):
         products = Product.objects.filter(shopping_cart=self.request.user.profile)
@@ -34,19 +32,12 @@ class ShoppingCart(ListView):
         for product in products:
             total_price += product.get_final_price
         context['total_price'] = total_price
-#       context["STRIPE_PUBLIC_KEY"] = settings.STRIPE_PUBLIC_KEY
 
         return context
 
 
 class SuccessView(TemplateView):
     template_name = "profiles/success.html"
-
-    def get(self, request, *args, **kwargs):
-        products = Product.objects.filter(shopping_cart=self.request.user.profile)
-        for product in products:
-            product.shopping_cart.remove(self.request.user.profile)
-        return redirect("home")
 
 
 class CancelView(TemplateView):
@@ -56,9 +47,14 @@ class CancelView(TemplateView):
 class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
         products = Product.objects.filter(shopping_cart=self.request.user.profile)
+        total_price = 0
+        for product in products:
+            total_price += product.get_final_price
         YOUR_DOMAIN = "http://127.0.0.1:8000/profiles/"
         line_items = []
         metadata = {}
+        metadata['total_price'] = total_price
+        metadata['slug'] = self.request.user.profile.slug
         for product in products:
             metadata[product.title] = 'product.url'
             line_items.append({
@@ -76,7 +72,7 @@ class CreateCheckoutSessionView(View):
             line_items=line_items,
             metadata=metadata,
             mode='payment',
-            success_url=YOUR_DOMAIN + 'success/' + random_url,
+            success_url=YOUR_DOMAIN + 'success/',
             cancel_url=YOUR_DOMAIN + 'cancel/',
         )
 
@@ -85,7 +81,6 @@ class CreateCheckoutSessionView(View):
 
 @csrf_exempt
 def stripe_webhook(request):
-    print(request.data)
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
     event = None
@@ -117,10 +112,18 @@ def stripe_webhook(request):
             recipient_list=[customer_email],
             from_email=str(os.getenv('EMAIL_HOST_USER'))
         )
-        # for product in products:
-        #     print(session["metadata"]['products'])
-        #     print(type(session["metadata"]['products']))
-        #     product.shopping_cart.remove(session["metadata"]['user'])
+
+        profile = Profile.objects.get(slug=session["metadata"]['slug'])
+        products = Product.objects.filter(shopping_cart=profile)
+        for product in products:
+            product.shopping_cart.remove(profile)
+            product.favorite.remove(profile)
+
+        total_price = 0
+        for product in products:
+            total_price += product.get_final_price
+        profile.balance = profile.balance - decimal.Decimal(session["metadata"]['total_price'])
+        profile.save()
 
     return HttpResponse(status=200)
 
@@ -145,6 +148,8 @@ class ProfileDetail(DetailView):
     template_name = 'profiles/myprofile.html'
     context_object_name = 'profile'
     slug_url_kwarg = 'profile_slug'
+    # form_class = EditProfileForm
+    # success_url = reverse_lazy('profiles:myprofile')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -153,6 +158,94 @@ class ProfileDetail(DetailView):
         profile = Profile.objects.get(user=user)
         context['profile'] = profile
         return context
+
+
+def my_profile_view(request):
+    profile = Profile.objects.get(user=request.user)
+    form = EditProfileForm(request.POST or None, request.FILES or None, instance=profile)
+    confirm = False
+
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            confirm = True
+
+    context = {
+        'profile': profile,
+        'form': form,
+        'confirm': confirm,
+    }
+
+    return render(request, 'profiles/edit_profile.html', context)
+
+
+# class EditProfile(DetailView, FormMixin):
+#     model = Profile
+#     template_name = 'profiles/edit_profile.html'
+#     context_object_name = 'profile'
+#     slug_url_kwarg = 'profile_slug'
+#     form_class = EditProfileForm
+#
+#     def get_success_url(self):
+#         return reverse_lazy('profiles:myprofile', kwargs={'profile_slug': self.request.user.profile.slug})
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['title'] = 'Редактирование профиля'
+#         user = User.objects.get(username=self.request.user)
+#         profile = Profile.objects.get(user=user)
+#         context['profile'] = profile
+#         return context
+#
+#     # def form_valid(self, form, **kwargs):
+#     #     form.save()
+#     #     return super().form_valid(form)
+#
+#     def post(self, request, *args, **kwargs):
+#         form = self.get_form()
+#         self.object = form.save(commit=False)
+#         if form.is_valid():
+#             return self.form_valid(form)
+#         else:
+#             return self.form_invalid(form)
+#
+#     def form_valid(self, form):
+#         self.object.profile = self.get_object()
+#         # self.object.user = self.request.user.profile
+#         self.object.save()
+#         return super().form_valid(form)
+
+    # def get_success_url(self):
+    #     return reverse_lazy('profiles:myprofile', kwargs={'profile_slug': self.get_object().slug})
+    #
+    # def post(self, request, *args, **kwargs):
+    #     form = self.get_form(self.form_class)
+    #     self.object = form.save(commit=False)
+    #     if form.is_valid():
+    #         return self.form_valid(form)
+    #     else:
+    #         return self.form_invalid(form)
+    #
+    # def form_valid(self, form):
+    #     form.save()
+    #     return super().form_valid(form)
+
+    # Cannot assign "<Profile: asdfg>": "Profile.user" must be a "User" instance.
+
+    #
+    # def post(self, request, *args, **kwargs):
+    #     form = self.get_form()
+    #     self.object = form.save(commit=False)
+    #     print(self.object)
+    #     if form.is_valid():
+    #         return self.form_valid(form)
+    #     else:
+    #         return self.form_invalid(form)
+
+    # def form_valid(self, form):
+    #     self.object.profile = self.request.user.profile
+    #     self.object.save()
+    #     return super().form_valid(form)
 
 
 

@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-    <br>
-    <link rel="stylesheet" href="style.css">
+<!--    <link rel="stylesheet" href="style.css">-->
     <script src="https://js.stripe.com/v3/"></script>
-    <div class="row justify-content-start" style="margin-top:20px; margin-left:20px; margin-bottom:20px; margin-right:20px">
+    <div class="row justify-content-start" style="margin-top:20px; margin-left:20px;padding-bottom:20px">
             <ul class="list-unstyled">
                  {% for product in products %}
                     <li>
@@ -22,12 +21,23 @@
                         <a href="{% url 'products:game' product.slug %}"><img style="max-width:17%" src={{product.image.url}}  class="img-fluid scale rounded-3"></a>
                     </li>
                     <br>
+                    <li>
+                        <a href="{% url 'products:add-remove-cart' product.slug %}"><button class="btn btn-outline-success" type="submit">Удалить из корзины</button></a>
+                    </li>
+                    <br>
                  {% endfor %}
             </ul>
-        <p>Итоговая цена {{ total_price }}</p>
-        <form action="{% url 'profiles:create-checkout-session' %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" id="checkout-button" class="btn btn-success">К оплате</button>
-        </form>
+        {% if total_price %}
+            <h3>Итоговая цена {{ total_price }}</h3>
+            <form action="{% url 'profiles:create-checkout-session' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" id="checkout-button" class="btn btn-success">К оплате</button>
+                <br>
+            </form>
+        {% else %}
+            <h3>У вас нет игр в корзине</h3>
+            <a href="{% url 'products:catalog' %}"><button class="btn btn-outline-success" type="submit">К покупкам!</button></a>
+        {% endif %}
+
     </div>
 {% endblock content %}

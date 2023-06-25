@@ -16,10 +16,18 @@
                     </li>
                     {% endif %}
                     <li>
-                        <a href="{% url 'products:game' product.slug %}"><img style="max-width:20%" src={{product.image.url}}  class="img-fluid scale rounded-3"></a>
+                        <a href="{% url 'products:game' product.slug %}"><img style="max-width:17%" src={{product.image.url}}  class="img-fluid scale rounded-3"></a>
+                    </li>
+                    <br>
+                    <li>
+                        <a href="{% url 'products:add-remove-favorite' product.slug %}"><button class="btn btn-outline-success" type="submit">Удалить из желаемого</button></a>
                     </li>
                     <br>
                  {% endfor %}
             </ul>
+        {% if not products %}
+            <h3>У вас нет игр в избранном</h3>
+            <a href="{% url 'products:catalog' %}"><button class="btn btn-outline-success" type="submit">К покупкам!</button></a>
+        {% endif %}
     </div>
 {% endblock content %}

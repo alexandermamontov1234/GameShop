@@ -43,7 +43,6 @@ INSTALLED_APPS = [
 
     'profiles.apps.ProfilesConfig',
     'products.apps.ProductsConfig',
-
     'django.contrib.sites',
     'allauth',
     'allauth.account',

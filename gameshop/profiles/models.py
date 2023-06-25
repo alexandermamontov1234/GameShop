@@ -1,6 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 from django.urls import reverse
+import uuid
+
+
+def get_random_code():
+    code = str(uuid.uuid4())[:8].replace('-', '').lower()
+    return code
 
 
 class Profile(models.Model):
@@ -23,8 +30,32 @@ class Profile(models.Model):
     def __str__(self):
         return str(self.user.username)
 
+    # def save(self, *args, **kwargs):
+        # to_slug = str(self.user)
+        # self.slug = to_slug
+        # super().save(*args, **kwargs)
+
+    __initial_first_name = None
+    __initial_last_name = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__initial_first_name = self.first_name
+        self.__initial_last_name = self.last_name
+
     def save(self, *args, **kwargs):
-        self.slug = str(self.user)
+        ex = False
+        to_slug = self.slug
+        if self.first_name != self.__initial_first_name or self.last_name != self.__initial_last_name or self.slug == "":
+            if self.first_name and self.last_name:
+                to_slug = slugify(str(self.first_name) + " " + str(self.last_name))
+                ex = Profile.objects.filter(slug=to_slug).exists()
+                while ex:
+                    to_slug = slugify(to_slug + " " + str(get_random_code()))
+                    ex = Profile.objects.filter(slug=to_slug).exists()
+            else:
+                to_slug = str(self.user)
+        self.slug = to_slug
         super().save(*args, **kwargs)
 
     class Meta:

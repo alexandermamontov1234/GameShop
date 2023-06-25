@@ -5,7 +5,29 @@
         <ul class="list-unstyled">
             <li><h1>{{ product }}</h1></li>
             <li><h5>Категория {{product.cat}}</h5></li>
-            <li><img src={{product.image.url}} width="auto" height="400" class="rounded-3"></p></li>
+            <li><img src={{product.image.url}} width="auto" height="400" class="rounded-3"></li>
+            {% if request.user.is_authenticated %}
+                <br>
+                <div class="d-flex">
+                    <div class="d-inline-block">
+                        <a href="{% url 'products:add-remove-favorite' product.slug %}"><button class="btn btn-outline-success" name="add-fav-frm" type="submit">{{ fav }}</button></a>
+<!--                        <form action="{% url 'products:game' product.slug %}" method="POST" class="d-flex">-->
+<!--                            {% csrf_token %}-->
+<!--                            <input type="submit" value="{{ fav }}" class="btn btn-success" name="add-fav-frm">-->
+<!--                        </form>-->
+                    </div>
+                    <div class="d-inline-block ps-2">
+                        <a href="{% url 'products:add-remove-cart' product.slug %}"><button class="btn btn-outline-success" name="add-cart-frm" type="submit">{{ cart }}</button></a>
+
+
+<!--                        <form action="{% url 'products:game' product.slug %}" method="POST" class="d-flex">-->
+<!--                            {% csrf_token %}-->
+<!--                            <input type="submit" value="{{ cart }}" class="btn btn-success" name="add-cart-frm">-->
+<!--                        </form>-->
+                    </div>
+                </div>
+            {% endif %}
+            <br>
             <li><h5>Цена {{product.price}}</h5></li>
             <li><h5>Рейтинг {{product.get_rating}}</h5></li>
             <li><h6>Описание</h6> {{product.description}}</li>
@@ -21,9 +43,9 @@
             <br>
             <li>
                 <form action="" method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-success">Добавить</button>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Добавить" class="btn btn-success" name="review_frm">
                 </form>
             </li>
             {% for message in messages %}

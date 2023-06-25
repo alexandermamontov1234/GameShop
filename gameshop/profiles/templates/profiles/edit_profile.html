@@ -17,10 +17,13 @@
             <li>
                 <img src={{profile.avatar.url}} style="max-width:14%" class="img-fluid">
             </li>
-            <br>
-            <li><a class="dropdown-item" href="{% url 'profiles:edit-profile' %}">
-                <button class="btn btn-outline-success" type="submit">Редактировать профиль</button>
-            </a></li>
+            <li>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Редактировать" class="btn btn-success" name="edit_frm">
+                </form>
+            </li>
         </ul>
     </div>
 {% endblock content %}
