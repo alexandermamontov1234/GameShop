@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -9,17 +10,6 @@ from django.views.generic.edit import FormMixin
 from .models import Product, Category, Review
 from profiles.models import Profile
 from .forms import AddReviewForm
-
-
-class CategoryView(ListView):
-    model = Category
-    template_name = 'products/categories.html'
-    context_object_name = 'categories'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Категории'
-        return context
 
 
 class CategoryDetail(DetailView):
@@ -50,7 +40,7 @@ class ProductsView(ListView):
         return context
 
 
-class ProductDetail(DetailView, FormMixin):
+class ProductDetail(LoginRequiredMixin, DetailView, FormMixin):
     model = Product
     template_name = 'products/detail_product.html'
     context_object_name = 'product'
@@ -135,7 +125,6 @@ def add_remove_favorite(request, product_slug):
     user = request.user
     product = Product.objects.get(slug=product_slug)
     profile = Profile.objects.get(user=user)
-
     if product in Product.objects.filter(favorite=profile):
         product.favorite.remove(profile)
     else:

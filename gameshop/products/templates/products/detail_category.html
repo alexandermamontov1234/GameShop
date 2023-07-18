@@ -18,9 +18,15 @@
                                 <h5>Цена {{ product.get_final_price}}</h5>
                             </li>
                         {% endif %}
-                        <li>
-                            <a href="{% url 'products:game' product.slug %}"><img src={{product.image.url}} width="auto" height="400" class="img-fluid scale rounded-3"></a>
-                        </li>
+                        {% if product.image %}
+                            <li>
+                                <a href="{% url 'products:game' product.slug %}"><img src={{product.image.url}}  class="img-fluid scale rounded-3"></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{% url 'products:game' product.slug %}">{{product.title}}</a>
+                            </li>
+                        {% endif %}
                         <br>
                     {% endif %}
                  {% endfor %}
@@ -42,9 +48,15 @@
                                 <h5>Цена {{ product.get_final_price}}</h5>
                             </li>
                         {% endif %}
-                        <li>
-                            <a href="{% url 'products:game' product.slug %}"><img src={{product.image.url}} width="auto" height="400"  class="img-fluid scale rounded-3"></a>
-                        </li>
+                        {% if product.image %}
+                            <li>
+                                <a href="{% url 'products:game' product.slug %}"><img src={{product.image.url}}  class="img-fluid scale rounded-3"></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{% url 'products:game' product.slug %}">{{product.title}}</a>
+                            </li>
+                        {% endif %}
                         <br>
                     {% endif %}
                  {% endfor %}

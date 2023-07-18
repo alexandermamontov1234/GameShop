@@ -5,25 +5,18 @@
         <ul class="list-unstyled">
             <li><h1>{{ product }}</h1></li>
             <li><h5>Категория {{product.cat}}</h5></li>
-            <li><img src={{product.image.url}} width="auto" height="400" class="rounded-3"></li>
+            {% if product.image %}
+                <li><img src={{product.image.url}} width="auto" height="400" class="rounded-3"></li>
+            {% endif %}
             {% if request.user.is_authenticated %}
                 <br>
                 <div class="d-flex">
                     <div class="d-inline-block">
                         <a href="{% url 'products:add-remove-favorite' product.slug %}"><button class="btn btn-outline-success" name="add-fav-frm" type="submit">{{ fav }}</button></a>
-<!--                        <form action="{% url 'products:game' product.slug %}" method="POST" class="d-flex">-->
-<!--                            {% csrf_token %}-->
-<!--                            <input type="submit" value="{{ fav }}" class="btn btn-success" name="add-fav-frm">-->
-<!--                        </form>-->
+
                     </div>
                     <div class="d-inline-block ps-2">
                         <a href="{% url 'products:add-remove-cart' product.slug %}"><button class="btn btn-outline-success" name="add-cart-frm" type="submit">{{ cart }}</button></a>
-
-
-<!--                        <form action="{% url 'products:game' product.slug %}" method="POST" class="d-flex">-->
-<!--                            {% csrf_token %}-->
-<!--                            <input type="submit" value="{{ cart }}" class="btn btn-success" name="add-cart-frm">-->
-<!--                        </form>-->
                     </div>
                 </div>
             {% endif %}

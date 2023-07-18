@@ -1,16 +1,22 @@
 import decimal
-
+import uuid
 from django.db import models
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 from django.urls import reverse
 from profiles.models import Profile
 from django.db.models import Avg
+from django.template.defaultfilters import slugify
+
+
+def get_random_code():
+    code = str(uuid.uuid4())[:8].replace('-', '').lower()
+    return code
 
 
 class Product(models.Model):
     title = models.CharField(max_length=150, blank=True, verbose_name='Название товара')
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, verbose_name='Цена товара')
-    image = models.ImageField(upload_to='products', validators=[FileExtensionValidator(['pnj', 'jpg', 'jpeg'])], blank=True)
+    image = models.ImageField(default='products/defaultgame.png', upload_to='products', validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])], blank=True)
     description = models.TextField(blank=True)
     slug = models.SlugField(unique=True, db_index=True, verbose_name='URL')
     discount = models.FloatField(blank=True, default=0)

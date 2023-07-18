@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import ProfileDetail, ShoppingCart, Favorite, CancelView, SuccessView, CreateCheckoutSessionView, \
-    stripe_webhook, my_profile_view
+    stripe_webhook, edit_profile_view
 
 app_name = 'profiles'
 
@@ -14,6 +14,6 @@ urlpatterns = [
     # path('success/', SuccessView.as_view(), name='success'),
     # path('', ProductLandingPageView.as_view(), name='landing-page'),
     path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session'),
-    path('edit', my_profile_view, name='edit-profile'),
+    path('edit', edit_profile_view, name='edit-profile'),
     path('<slug:profile_slug>', ProfileDetail.as_view(), name='myprofile')
 ]

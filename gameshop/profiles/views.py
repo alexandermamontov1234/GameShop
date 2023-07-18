@@ -148,8 +148,6 @@ class ProfileDetail(DetailView):
     template_name = 'profiles/myprofile.html'
     context_object_name = 'profile'
     slug_url_kwarg = 'profile_slug'
-    # form_class = EditProfileForm
-    # success_url = reverse_lazy('profiles:myprofile')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -160,15 +158,10 @@ class ProfileDetail(DetailView):
         return context
 
 
-def my_profile_view(request):
+def edit_profile_view(request):
     profile = Profile.objects.get(user=request.user)
     form = EditProfileForm(request.POST or None, request.FILES or None, instance=profile)
     confirm = False
-
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            confirm = True
 
     context = {
         'profile': profile,
@@ -176,76 +169,10 @@ def my_profile_view(request):
         'confirm': confirm,
     }
 
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            confirm = True
+            return render(request, 'profiles/myprofile.html', context)
+
     return render(request, 'profiles/edit_profile.html', context)
-
-
-# class EditProfile(DetailView, FormMixin):
-#     model = Profile
-#     template_name = 'profiles/edit_profile.html'
-#     context_object_name = 'profile'
-#     slug_url_kwarg = 'profile_slug'
-#     form_class = EditProfileForm
-#
-#     def get_success_url(self):
-#         return reverse_lazy('profiles:myprofile', kwargs={'profile_slug': self.request.user.profile.slug})
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['title'] = 'Редактирование профиля'
-#         user = User.objects.get(username=self.request.user)
-#         profile = Profile.objects.get(user=user)
-#         context['profile'] = profile
-#         return context
-#
-#     # def form_valid(self, form, **kwargs):
-#     #     form.save()
-#     #     return super().form_valid(form)
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.get_form()
-#         self.object = form.save(commit=False)
-#         if form.is_valid():
-#             return self.form_valid(form)
-#         else:
-#             return self.form_invalid(form)
-#
-#     def form_valid(self, form):
-#         self.object.profile = self.get_object()
-#         # self.object.user = self.request.user.profile
-#         self.object.save()
-#         return super().form_valid(form)
-
-    # def get_success_url(self):
-    #     return reverse_lazy('profiles:myprofile', kwargs={'profile_slug': self.get_object().slug})
-    #
-    # def post(self, request, *args, **kwargs):
-    #     form = self.get_form(self.form_class)
-    #     self.object = form.save(commit=False)
-    #     if form.is_valid():
-    #         return self.form_valid(form)
-    #     else:
-    #         return self.form_invalid(form)
-    #
-    # def form_valid(self, form):
-    #     form.save()
-    #     return super().form_valid(form)
-
-    # Cannot assign "<Profile: asdfg>": "Profile.user" must be a "User" instance.
-
-    #
-    # def post(self, request, *args, **kwargs):
-    #     form = self.get_form()
-    #     self.object = form.save(commit=False)
-    #     print(self.object)
-    #     if form.is_valid():
-    #         return self.form_valid(form)
-    #     else:
-    #         return self.form_invalid(form)
-
-    # def form_valid(self, form):
-    #     self.object.profile = self.request.user.profile
-    #     self.object.save()
-    #     return super().form_valid(form)
-
-
-
