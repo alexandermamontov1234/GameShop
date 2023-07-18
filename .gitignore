@@ -5,6 +5,8 @@ __pycache__/
 
 migrations
 .idea
+*.jpg
+*.png
 
 # C extensions
 *.so
