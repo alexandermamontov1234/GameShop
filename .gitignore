@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# volumes
+pgadmin_data
+postgres_data
+
 migrations
 .idea
 *.jpg

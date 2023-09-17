@@ -110,7 +110,7 @@ def stripe_webhook(request):
             subject="Вот Ваш продукт",
             message=f"Спасибо за покупку! Вот ваши товары:{message}",
             recipient_list=[customer_email],
-            from_email=str(os.getenv('EMAIL_HOST_USER'))
+            from_email='sanek_mamontov@mail.ru'
         )
 
         profile = Profile.objects.get(slug=session["metadata"]['slug'])

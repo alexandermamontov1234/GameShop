@@ -11,7 +11,6 @@ from .models import Product, Category, Review
 from profiles.models import Profile
 from .forms import AddReviewForm
 
-
 class CategoryDetail(DetailView):
     model = Category
     template_name = 'products/detail_category.html'

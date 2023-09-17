@@ -12,8 +12,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-load_dotenv()
+from dotenv import dotenv_values
+
+
+config = dotenv_values(".env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,13 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = str(os.getenv('SECRET_KEY'))
+SECRET_KEY = config.get("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(config.get("DEBUG"))
 
-ALLOWED_HOSTS = []
 
+ALLOWED_HOSTS = config.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 # Application definition
 
@@ -84,13 +87,13 @@ WSGI_APPLICATION = 'gameshop.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': str(os.getenv('NAME')),
-        'USER': str(os.getenv('USER')),
-        'PASSWORD': str(os.getenv('PASSWORD')),
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": config.get("SQL_ENGINE"),
+        "NAME": config.get("SQL_DATABASE"),
+        "USER": config.get("SQL_USER"),
+        "PASSWORD": config.get("SQL_PASSWORD"),
+        "HOST": config.get("SQL_HOST"),
+        "PORT": config.get("SQL_PORT"),
     }
 }
 
@@ -116,11 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
 EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 2525
-EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = str(os.getenv('EMAIL_HOST_USER'))
-EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD'))
+EMAIL_HOST_USER = config.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config.get("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
@@ -179,6 +181,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'staticfiles', 'media_root')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-STRIPE_PUBLIC_KEY = str(os.getenv('STRIPE_PUBLIC_KEY'))
-STRIPE_SECRET_KEY = str(os.getenv('STRIPE_SECRET_KEY'))
-STRIPE_WEBHOOK_SECRET = str(os.getenv('STRIPE_WEBHOOK_SECRET'))
+STRIPE_PUBLIC_KEY = config.get("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = config.get("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = config.get("STRIPE_WEBHOOK_SECRET")
